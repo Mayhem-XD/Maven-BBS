@@ -1,16 +1,15 @@
 # Java
 
-<h1>자바 웹 강좌</h1>
+<h1>Bulletin Board System</h1>
 
 <p>
-빅데이터 머신러닝을 활용한 분석 및 UI 전문가 과정
-
-연세it미래교육관에서 2023년 부터 2023년8월2일까지 진행됩니다.
+Maven과 mySQL을 사용한 simple BBS project
 </p>
 
 <h3>개발 도구</h3>
 
->  ![img_61 (2)](https://github.com/Mayhem-XD/PyCo/assets/116787370/9945e567-f717-4da7-9db7-f4147960d7d9) ![img_61](https://github.com/Mayhem-XD/PyCo/assets/116787370/315f7972-a2df-4f8d-aeba-b889b50d0c5d)
+>  ![img_61](https://github.com/Mayhem-XD/Java/assets/116787370/80653f1d-6745-40e3-8af4-fc82d7d81518) ![img_61](https://github.com/Mayhem-XD/PyCo/assets/116787370/315f7972-a2df-4f8d-aeba-b889b50d0c5d) ![Untitled-1](https://github.com/Mayhem-XD/Java/assets/116787370/076d94a4-563d-4b9e-ac52-0509d22077e6)
+> ![img_61 (2)](https://github.com/Mayhem-XD/Java/assets/116787370/8406f594-fb71-4cdc-80fd-ff72268cfcab)     ![vscode](https://github.com/Mayhem-XD/Java/assets/116787370/fbda9bcc-d200-448d-bca2-d1e142d45fcd)    ![img_61 (3)](https://github.com/Mayhem-XD/Java/assets/116787370/13a06fa8-7827-4a1c-a19f-7b23c25f4a4f)
 > 
 <hr>
 <h2>수정중</h2>
@@ -20,57 +19,59 @@
 > tomcat9
 > 
 <hr>
-<br><br><br><br>
+<br><br>
+
+<h4>일단 과정 수정중</h4>
+
+> New -> Maven simple project 체크 <br>
+> Group id : com.ys <br>
+> Artifact id : bbs <br>
+> Packaging : WAR <br>
+> Name : maven bbs project <br>
+> Description : Bulletin Board Service <br>
+> server.xml, context.xml 수정
 
 ~~~ java
 
-public User getUser(String uid) {
-		User u = null;
-		Connection conn = getConnection();		 // 데이터베이스 연결을 설정
-		String sql = "select * from users where uid=? and isDeleted=0";			//  SQL 쿼리를 준비
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, uid);		// 쿼리의 첫 번째 매개변수에 사용자 ID를 설정
-			ResultSet rs = pstmt.executeQuery();	// 쿼리를 실행하고 결과를 가져옴		
-			while (rs.next()) {                   // ResultSet 객체는 DB쿼리의 결과 테이블 형태의 데이터	
-				u = new User(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-							 LocalDate.parse(rs.getString(5)), rs.getInt(6));
-			}
-			rs.close(); pstmt.close(); conn.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return u;
-	}
+<properties>
+	  <maven.compiler.target>11</maven.compiler.target>
+	  <maven.compiler.source>11</maven.compiler.source>
+  </properties>
 
-// PreparedStatement는 쿼리에 매개변수를 사용가능
-// Statement는 쿼리에 매개변수를 사용불가
-// PreparedStatement는 쿼리가 실행되기 전에 컴파일
-// Statement는 쿼리가 실행될 때마다 컴파일
-
-
-
-
-	public List<User> getUserList() {
-		List<User> list = new ArrayList<User>();
-		Connection conn = getConnection();
-		String sql = "select * from users where isDeleted=0 order by regDate desc, uid";
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);		
-			while (rs.next()) {
-				User u = new User(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-							 LocalDate.parse(rs.getString(5)), rs.getInt(6));
-				list.add(u);
-			}
-			rs.close(); stmt.close(); conn.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+<dependencies>
+	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>8.0.33</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+	<dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>javax.servlet-api</artifactId>
+	    <version>4.0.1</version>
+	    <scope>provided</scope>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+	<dependency>
+	    <groupId>org.mindrot</groupId>
+	    <artifactId>jbcrypt</artifactId>
+	    <version>0.4</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
+	<dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>jstl</artifactId>
+	    <version>1.2</version>
+	</dependency>
+  </dependencies>
 
 ~~~
+
+
+<br><br>
+
+
 
 
 <h5>.././././</h5>
