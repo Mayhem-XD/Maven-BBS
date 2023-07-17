@@ -5,6 +5,7 @@
     <display-name>UserController</display-name>
     <servlet-name>UserController</servlet-name>
     <servlet-class>controller.UserController</servlet-class>
+    
   </servlet>
   <servlet-mapping>
     <servlet-name>UserController</servlet-name>
@@ -30,4 +31,5 @@
     <servlet-name>UserController2</servlet-name>
     <url-pattern>/User/*</url-pattern>
   </servlet-mapping>
+  
 </web-app>
