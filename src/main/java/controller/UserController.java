@@ -1,6 +1,9 @@
 package controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,6 +20,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import dao.UserDao;
 import entity.User;
+import utility.UserService;
 
 @WebServlet("/user/*")
 @MultipartConfig(
@@ -34,6 +38,8 @@ public class UserController extends HttpServlet {
 		String[] uri = request.getRequestURI().split("/");
 		String action = uri[uri.length-1];
 		User user = null;
+		Part filePart = null;
+		String uid=null, pwd=null, pwd2=null, uname=null, email=null,addr=null,filename=null;
 		HttpSession session = request.getSession();
 		session.setAttribute("menu", "user");
 		
@@ -46,25 +52,25 @@ public class UserController extends HttpServlet {
 				rd.forward(request, response);
 			}
 			else {
-				String uid = request.getParameter("uid");
-				String pwd = request.getParameter("pwd");
-				String pwd2 = request.getParameter("pwd2");
-				String uname = request.getParameter("uname");
-				String email = request.getParameter("email");
-				Part filePart = request.getPart("profile");
-				String addr = request.getParameter("addr");
+				uid = request.getParameter("uid");
+				pwd = request.getParameter("pwd");
+				pwd2 = request.getParameter("pwd2");
+				uname = request.getParameter("uname");
+				email = request.getParameter("email");
+				filePart = request.getPart("profile");
+				addr = request.getParameter("addr");
 				
-				String filename=null;
-				if(filePart != null) {
+				
+				try {
 					filename = filePart.getSubmittedFileName();
-					Integer dotPosition = filename.indexOf(".");
+					int dotPosition = filename.indexOf(".");
 					String firsPart = filename.substring(0,dotPosition);
 					filename = filename.replace(firsPart, uid);
 					filePart.write(PROFILE_PATH+filename);
+				} catch (Exception e) {
+					System.out.println("프로필 사진을 입력하지 않았습니다.");
 				}
-				System.out.println(pwd+" "+pwd2);
 				
-//				uid 중복
 				if(uDao.getUser(uid) != null) {
 					request.setAttribute("msg", "사용자 ID가 중복되었습니다.");
 					request.setAttribute("url", "/bbs/user/register");
@@ -86,14 +92,27 @@ public class UserController extends HttpServlet {
 					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
 					rd.forward(request, response);
 				}
-				
-				
-				
 			}
 			break;
 		case "list":
+			String page_ = request.getParameter("page");
+			int page = Integer.parseInt(page_);
+			List<User> list = uDao.getUserList(page);
+			request.setAttribute("userList", list);
+			int totalUsers = uDao.getUserCount();
+			int totalPages = (int) Math.ceil(totalUsers / 10.);
+			session.setAttribute("currentUserPage", page);
+			List<String> pageList = new ArrayList<>();
+			for (int i = 1; i <= totalPages; i++)
+				pageList.add(String.valueOf(i));
+			request.setAttribute("pageList", pageList);
+			
 			rd = request.getRequestDispatcher("/WEB-INF/view/user/list.jsp");
 			rd.forward(request, response);
+			break;
+		case "logout":
+			session.invalidate();
+			response.sendRedirect("/bbs/user/login");
 			break;
 		case "login":
 			if (request.getMethod().equals("GET")) {
@@ -101,12 +120,89 @@ public class UserController extends HttpServlet {
 				rd.forward(request, response);
 			}
 			else {
+				uid = request.getParameter("uid");
+				pwd = request.getParameter("pwd");
 				
+				UserService us = new UserService();
+				int result = us.login(uid, pwd);
+				if (result == UserService.CORRECT_LOGIN) {
+					session.setAttribute("uid", uid);
+					user = uDao.getUser(uid);
+					session.setAttribute("uname", user.getUname());
+					session.setAttribute("email", user.getEmail());
+					session.setAttribute("addr", user.getAddr());
+					
+					// 환영 메세지
+					request.setAttribute("msg", user.getUname() + "님 환영합니다.");
+					request.setAttribute("url", "/bbs/user/list?page=1");
+					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
+					rd.forward(request, response);
+				} else if (result == UserService.WRONG_PASSWORD) {
+					request.setAttribute("msg","잘못된 패스워드입니다. 다시 입력하세요.");
+					request.setAttribute("url", "/bbs/user/login");
+					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
+					rd.forward(request, response);
+				} else {		// UID_NOT_EXIST
+					request.setAttribute("msg","ID가 존재하지 않습니다.");
+					request.setAttribute("url", "/bbs/user/register");
+					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
+					rd.forward(request, response);
+				}
 			}
+			break;
+		case "delete":
+			uid = request.getParameter("uid");
+			rd = request.getRequestDispatcher("/WEB-INF/view/user/delete.jsp?uid="+uid);
+			rd.forward(request, response);
+			break;
+		case "deleteConfirm":
+			uid = request.getParameter("uid");
+			uDao.deleteUser(uid);
+			response.sendRedirect("/bbs/user/list?page="+session.getAttribute("currentUserPage"));
+			break;
+		case "update":
+			if (request.getMethod().equals("GET")) {
+				uid = request.getParameter("uid");
+				user = uDao.getUser(uid);
+				request.setAttribute("user", user);
+				rd = request.getRequestDispatcher("/WEB-INF/view/user/update.jsp?uid"+uid);
+				rd.forward(request, response);
+			}	else {
+					uid = request.getParameter("uid");
+					String oldFilename = request.getParameter("filename");
+					uname = request.getParameter("uname");
+					email = request.getParameter("email");
+					filePart = request.getPart("profile");
+					addr = request.getParameter("addr");
+					try {
+						filename = filePart.getSubmittedFileName();
+						if(!(oldFilename == null || oldFilename.equals(""))) {
+							
+							File oldFile = new File(PROFILE_PATH+oldFilename);
+							oldFile.delete();
+						}
+						int dotPosition = filename.indexOf(".");
+						String firsPart = filename.substring(0,dotPosition);
+						filename = filename.replace(firsPart, uid);
+						filePart.write(PROFILE_PATH+filename);
+					} catch (Exception e) {
+						System.out.println("프로필 사진을 변경하지 않았습니다.");
+					}
+				filename = (filename == null) ? oldFilename : filename;
+				user = new User(uid, uname, email, filename, addr);
+				uDao.updateUser(user);
+				response.sendRedirect("/bbs/user/list?page="+session.getAttribute("currentUserPage"));
+			}
+			
 			break;
 			
 			
+			
+			
+		default:
+			System.out.println(request.getRequestURI()+" 잘못된 경로입니다.");
 		}
+//			switch box end
 		
 	}
 
