@@ -23,7 +23,7 @@
             <div class="col-4"></div>
             <div class="col-4">
                 <h3>
-                    <strong>사용자 등록</strong>
+                    <strong>회원 가입</strong>
                 </h3>
                 <hr>
                 <form action="/bbs/user/register" method="post" enctype="multipart/form-data">
