@@ -88,6 +88,25 @@
         			</tr>
         		</c:forEach>
         		</table>
+        		<ul class="pagination justify-content-center mt-4">
+        			<c:if test="${currentBoardPage gt 10 }">
+        				<li class="page-item"><a class="page-link" href="/bbs/board/list?p=${startPage-1}&f=${field}&q=${query}">&laquo;</a></li>
+        			</c:if>
+        			<c:if test="${currentBoardPage le 10 }">
+        				<li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+        			</c:if>
+				<c:forEach var="page" items="${pageList}">
+					<li class="page-item ${(currentBoardPage eq page) ? 'active' : ''}">
+						<a class="page-link" href="/bbs/board/list?p=${page}&f=${field}&q=${query}">${page}</a>
+					</li>
+				</c:forEach>
+					<c:if test="${totalPages eq endPage}">
+						<li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+					</c:if>
+					<c:if test="${totalPages gt endPage}">
+						<li class="page-item"><a class="page-link" href="/bbs/board/list?p=${endPage+1}&f=${field}&q=${query}">&raquo;</a></li>
+					</c:if>
+				</ul>     
         	</div>
         	<!-- ======================== main ======================== -->
         </div>

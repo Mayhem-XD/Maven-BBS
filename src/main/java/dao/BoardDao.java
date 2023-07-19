@@ -79,5 +79,28 @@ public class BoardDao {
 		
 		return list;
 	}
+	public int getBoardCount(String field, String query) {
+		int count = 0;
+		Connection conn = getConnection();
+		String sql = "select count(bid) from board where isDeleted=0 AND " + field + " LIKE ?";
+
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+query+"%");
+			
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				count = rs.getInt(1);
+			}
+			rs.close();pstmt.close();conn.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		return count;
+	}
 
 }

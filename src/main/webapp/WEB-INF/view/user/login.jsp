@@ -25,7 +25,7 @@
                     </span>
                 </h3>
                 <hr>
-                <form action="bbs/user/login" method="post">
+                <form action="/bbs/user/login" method="post">
                     <table class="table table-borderless">
                         <tr>
                             <td><label for="uid" class="col-form-label">아이디</label></td>
