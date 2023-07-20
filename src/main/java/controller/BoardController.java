@@ -100,6 +100,12 @@ public class BoardController extends HttpServlet {
 				bDao.increaseViewCount(bid);
 			
 			board = bDao.getBoard(bid);
+			String jsonFiles = board.getFiles();
+			if (!(jsonFiles==null || jsonFiles.equals("")));{
+				List<String> fileList = ju.jsonToList(jsonFiles);
+				request.setAttribute("fileList", fileList);
+			}
+			
 			request.setAttribute("board", board);
 			List<Reply> replyList = rDao.getReplyList(bid);
 			request.setAttribute("replyList", replyList);
