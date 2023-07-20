@@ -62,7 +62,6 @@ public class BoardController extends HttpServlet {
 			field = (field == null || field.equals("")) ? "title" : field;
 			query = (query == null || query.equals("")) ? "" : query;
 			
-			session.setAttribute("currentBoardPage", page);
 			
 			List<Board> list = bDao.listBoard(field, query, page);
 			int totalBoardCount = bDao.getBoardCount(field, query);
@@ -74,6 +73,7 @@ public class BoardController extends HttpServlet {
 			for(int i = startPage;i<= endPage;i++)
 				pageList.add(String.valueOf(i));
 			
+			session.setAttribute("currentBoardPage", page);
 			request.setAttribute("boardList", list);
 			request.setAttribute("field", field);
 			request.setAttribute("query", query);
@@ -83,10 +83,10 @@ public class BoardController extends HttpServlet {
 			request.setAttribute("endpage", endPage);
 			request.setAttribute("pageList", pageList);
 			
-			
 			rd = request.getRequestDispatcher("/WEB-INF/view/board/list.jsp");
 			rd.forward(request, response);
 			break;
+			
 		case "detail":
 			bid = Integer.parseInt(request.getParameter("bid"));
 			uid = request.getParameter("uid");
@@ -136,7 +136,7 @@ public class BoardController extends HttpServlet {
 					fileList.add(filename);
 					
 				}
-				files = ju.ListToJson(fileList);
+				files = ju.listToJson(fileList);
 				
 				board = new Board(sessionUid,title,content,files);
 				bDao.insertBoard(board);

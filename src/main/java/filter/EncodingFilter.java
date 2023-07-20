@@ -16,11 +16,10 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class BbsFilter
  */
-@WebFilter({"/board/*","/user/*","/reply/*","/file/*"})
-public class EncorderFilter extends HttpFilter implements Filter {
+@WebFilter({"/board/*", "/file/*", "/reply/*", "/user/*"})
+public class EncodingFilter extends HttpFilter implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		

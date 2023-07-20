@@ -16,19 +16,18 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class BbsFilter
  */
-@WebFilter({"/board/*","/user/list","/user/logout","/user/update","/user/delete","/user/deleteConfirm","/reply/*"})
+@WebFilter({"/board/*", "/reply/*", "/user/list", "/user/logout",
+						"/user/update", "/user/delete", "/user/deleteConfirm"})
 public class LoginCheckFilter extends HttpFilter implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		
-		
-//		로그인을 안했으면 로그인 화면으로 이동
 		HttpSession session = httpRequest.getSession();
+		
+		// 로그인을 안했으면 로그인 화면으로 이동
 		String sessionUid = (String) session.getAttribute("uid");
-		if(sessionUid == null || sessionUid.equals("")) {
+		if (sessionUid == null || sessionUid.equals("")) {
 			httpResponse.sendRedirect("/bbs/user/login");
 			return;
 		}

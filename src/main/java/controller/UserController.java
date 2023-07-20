@@ -37,14 +37,15 @@ public class UserController extends HttpServlet {
 	
 		String[] uri = request.getRequestURI().split("/");
 		String action = uri[uri.length-1];
-		User user = null;
-		Part filePart = null;
-		String uid=null, pwd=null, pwd2=null, uname=null, email=null,addr=null,filename=null;
 		HttpSession session = request.getSession();
 		session.setAttribute("menu", "user");
-		
 		UserDao uDao = new UserDao();
 		RequestDispatcher rd = null;
+		User user = null;
+		Part filePart = null;
+		
+		String uid=null, pwd=null, pwd2=null, uname=null, email=null,addr=null,filename=null;
+		
 		switch (action) {
 		case "register":
 			if (request.getMethod().equals("GET")) {

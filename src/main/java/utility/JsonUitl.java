@@ -10,20 +10,19 @@ import org.json.simple.parser.JSONParser;
 import com.mysql.cj.xdevapi.JsonParser;
 
 public class JsonUitl {
-	public String ListToJson (List<String> list) {
-		JSONObject jobj = new JSONObject();
-		jobj.put("list", list);
-		
-	
-		return jobj.toString();
+	public String listToJson(List<String> list) {
+		JSONObject jObj = new JSONObject();
+		jObj.put("list", list);
+		return jObj.toString();
 	}
-	public List<String> jsonToList(String jStr){
+	
+	public List<String> jsonToList(String jStr) {
 		JSONParser parser = new JSONParser();
 		List<String> list = null;
 		try {
-			JSONObject jsonList = (JSONObject) parser.parse(jStr);
-			JSONArray jsonArr = (JSONArray) jsonList.get("list");
-			list = (List<String>) jsonArr;
+			JSONObject jObj = (JSONObject) parser.parse(jStr);
+			JSONArray jArr = (JSONArray) jObj.get("list");
+			list = (List<String>) jArr;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
