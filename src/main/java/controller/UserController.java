@@ -122,15 +122,16 @@ public class UserController extends HttpServlet {
 			else {
 				uid = request.getParameter("uid");
 				pwd = request.getParameter("pwd");
-				
 				UserService us = new UserService();
 				int result = us.login(uid, pwd);
+				
 				if (result == UserService.CORRECT_LOGIN) {
 					session.setAttribute("uid", uid);
 					user = uDao.getUser(uid);
 					session.setAttribute("uname", user.getUname());
 					session.setAttribute("email", user.getEmail());
 					session.setAttribute("addr", user.getAddr());
+					session.setAttribute("profile", user.getProfile());
 					
 					// 환영 메세지
 					request.setAttribute("msg", user.getUname() + "님 환영합니다.");

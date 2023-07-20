@@ -102,5 +102,59 @@ public class BoardDao {
 		
 		return count;
 	}
+	public Board getBoard(int bid) {
+		Board board =new Board();
+		Connection conn = getConnection();
+		String sql = "SELECT b.bid, b.uid, b.title, b.content, b.modTime, b.viewCount,\r\n"
+				+ "	b.replyCount, b.files, u.uname FROM board AS b JOIN users AS u ON b.uid=u.uid where b.bid=?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bid);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				board.setBid(rs.getInt(1));
+				board.setUid(rs.getString(2));
+				board.setTitle(rs.getString(3));
+				board.setContent(rs.getString(4));
+				board.setModTime(LocalDateTime.parse(rs.getString(5).replace(" ","T")));
+				board.setViewCount(rs.getInt(6));
+				board.setReplyCount(rs.getInt(7));
+				board.setFiles(rs.getString(8));
+				board.setUname(rs.getString(9));
+			}
+			rs.close(); pstmt.close(); conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return board;
+	}
+	public void increaseViewCount(int bid) {
+		Connection conn = getConnection();
+		String sql = "UPDATE board SET viewCount=viewCount+1 WHERE bid=?;";
+		try {
+			PreparedStatement pStmt = conn.prepareStatement(sql);
+			pStmt.setInt(1, bid);
+			
+			pStmt.executeUpdate();
+			pStmt.close(); conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void increaseReplyCount(int bid) {
+		Connection conn = getConnection();
+		String sql = "UPDATE board SET replyCount=replyCount+1 WHERE bid=?;";
+		try {
+			PreparedStatement pStmt = conn.prepareStatement(sql);
+			pStmt.setInt(1, bid);
+			
+			pStmt.executeUpdate();
+			pStmt.close(); conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 
 }

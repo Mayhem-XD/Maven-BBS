@@ -14,9 +14,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import dao.BoardDao;
+import dao.ReplyDao;
 import entity.Board;
+import entity.Reply;
+import utility.JsonUitl;
 
 /**
  * Servlet implementation class BoardController
@@ -30,6 +34,7 @@ import entity.Board;
 public class BoardController extends HttpServlet {
 	public static final int LIST_PER_PAGE = 10;	// 한 페이지당 글 목록의 개수
 	public static final int PAGE_PER_SCREEN = 10;	// 한 화면에 표시되는 페이지 개수
+	public static final String UPLOAD_PATH = "d:/Temp/upload/";
 	
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
@@ -40,9 +45,12 @@ public class BoardController extends HttpServlet {
 		String sessionUid = (String) session.getAttribute("uid");
 		session.setAttribute("menu", "board");
 		BoardDao bDao = new BoardDao();
+		ReplyDao rDao = new ReplyDao();
+		JsonUitl ju = new JsonUitl();
+		
 		RequestDispatcher rd = null;
 		int bid=0,page=0;
-		String title=null, content=null, files = null;
+		String title=null, content=null, files = null, uid = null;
 		Board board = null;
 		
 		switch (action) {
@@ -53,6 +61,7 @@ public class BoardController extends HttpServlet {
 			page = (page_ == null || page_.equals("")) ? 1 : Integer.parseInt(page_);
 			field = (field == null || field.equals("")) ? "title" : field;
 			query = (query == null || query.equals("")) ? "" : query;
+			
 			session.setAttribute("currentBoardPage", page);
 			
 			List<Board> list = bDao.listBoard(field, query, page);
@@ -60,6 +69,7 @@ public class BoardController extends HttpServlet {
 			int totalPages = (int) Math.ceil(totalBoardCount/(double) LIST_PER_PAGE);
 			int startPage = (int) Math.ceil((page-0.5)/PAGE_PER_SCREEN - 1) * PAGE_PER_SCREEN + 1;
 			int endPage = (int) Math.min(totalPages, startPage + PAGE_PER_SCREEN - 1);
+			
 			List<String> pageList = new ArrayList<String>();
 			for(int i = startPage;i<= endPage;i++)
 				pageList.add(String.valueOf(i));
@@ -77,6 +87,30 @@ public class BoardController extends HttpServlet {
 			rd = request.getRequestDispatcher("/WEB-INF/view/board/list.jsp");
 			rd.forward(request, response);
 			break;
+		case "detail":
+			bid = Integer.parseInt(request.getParameter("bid"));
+			uid = request.getParameter("uid");
+			String option = request.getParameter("option");
+			
+			if(uid.equals("")||uid==null)
+				System.out.println("null"+" blank");
+			
+//			본인이 조회한 경우에는 조회수를 증가시키지 않음
+			if((!uid.equals(sessionUid))&&(option==null || option.equals("")))
+				bDao.increaseViewCount(bid);
+			
+			board = bDao.getBoard(bid);
+			request.setAttribute("board", board);
+			List<Reply> replyList = rDao.getReplyList(bid);
+			request.setAttribute("replyList", replyList);
+			
+			
+			rd = request.getRequestDispatcher("/WEB-INF/view/board/detail.jsp");
+			rd.forward(request, response);
+			
+			
+			break;
+			
 		case "write":
 			if (request.getMethod().equals("GET")) {
 				rd = request.getRequestDispatcher("/WEB-INF/view/board/write.jsp");
@@ -84,11 +118,26 @@ public class BoardController extends HttpServlet {
 			} else {
 				title = request.getParameter("title");
 				content = request.getParameter("content");
+				
+				List<Part> fileParts = (List<Part>) request.getParts();
+				List<String> fileList = new ArrayList<String>();
+				System.out.println(fileParts.size());
+				for (Part part: fileParts) {
+					String filename = part.getSubmittedFileName();
+					if (filename == null)
+						continue;
+					part.write(UPLOAD_PATH + filename);
+					fileList.add(filename);
+					
+				}
+				files = ju.ListToJson(fileList);
+				
 				board = new Board(sessionUid,title,content,files);
 				bDao.insertBoard(board);
 				response.sendRedirect("/bbs/board/list?p=1&f=&q=");
 			}
 			break;
+		
 		}
 //		switch box end
 	}
