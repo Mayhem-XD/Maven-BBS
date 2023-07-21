@@ -15,73 +15,61 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.hamcrest.core.Is;
-
 /**
  * Servlet implementation class FileController
  */
 @WebServlet("/file/*")
-
 public class FileController extends HttpServlet {
 	
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String[] uri = request.getRequestURI().split("/");
-		String action = uri[uri.length-1];
-		String file = null;
-		String path = null;
+		String action = uri[uri.length - 1];
+		
 		File f = null;
 		FileInputStream fis = null;
 		OutputStream os = null;
-		byte[] buffer = new byte[1024*4];
+		String file = null, path = null;
+		byte[] buffer = new byte[1024*8];
 		
-		switch (action) {
+		switch(action) {
 		case "download":
-			request.setCharacterEncoding("utf-8");
 			file = request.getParameter("file");
 			path = BoardController.UPLOAD_PATH + file;
 			os = response.getOutputStream();
 			response.setContentType("text/html; charset=utf-8");
-			response.setHeader("Cach=control", "no-cache");
-			response.setHeader("Content-disposition", "attachment; fileName=" + URLEncoder.encode(file,"utf-8"));
+			response.setHeader("Cache-Control", "no-cache");
+			response.setHeader("Content-disposition", "attachment; fileName=" + URLEncoder.encode(file, "utf-8"));
 			
 			f = new File(path);
 			fis = new FileInputStream(f);
-			
-			while(true) {
+			while (true) {
 				int count = fis.read(buffer);
 				if (count == -1)
 					break;
 				os.write(buffer, 0, count);
 			}
-			fis.close();os.close();
-			
+			fis.close(); os.close();
 			break;
+			
 		case "profile":
 			file = request.getParameter("file");
 			path = UserController.PROFILE_PATH + file;
 			os = response.getOutputStream();
 			response.setContentType("text/html; charset=utf-8");
-			response.setHeader("Cach=control", "no-cache");
-			response.setHeader("Content-disposition", "attachment; fileName=" + URLEncoder.encode(file,"utf-8"));
+			response.setHeader("Cache-Control", "no-cache");
+			response.setHeader("Content-disposition", "attachment; fileName=" + URLEncoder.encode(file, "utf-8"));
 			
 			f = new File(path);
 			fis = new FileInputStream(f);
-			
-			while(true) {
+			while (true) {
 				int count = fis.read(buffer);
 				if (count == -1)
 					break;
 				os.write(buffer, 0, count);
 			}
-			fis.close();os.close();
+			fis.close(); os.close();
 			break;
-
 		}
-		
-		
-		
-		
-		
 		
 	}
 

@@ -1,15 +1,13 @@
 package utility;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.mysql.cj.xdevapi.JsonParser;
+public class JsonUtil {
 
-public class JsonUitl {
 	public String listToJson(List<String> list) {
 		JSONObject jObj = new JSONObject();
 		jObj.put("list", list);
@@ -28,4 +26,5 @@ public class JsonUitl {
 		}
 		return list;
 	}
+	
 }

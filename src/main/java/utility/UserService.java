@@ -2,7 +2,7 @@ package utility;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import dao.UserDao;
+import db.UserDao;
 import entity.User;
 
 public class UserService {
