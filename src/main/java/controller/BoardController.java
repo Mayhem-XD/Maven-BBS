@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ import utility.JsonUtil;
 		maxRequestSize = 1024 * 1024 * 10
 )
 public class BoardController extends HttpServlet {
-	public static final int LIST_PER_PAGE = 10;		// 한 페이지당 글 목록의 갯수
-	public static final int PAGE_PER_SCREEN = 10;	// 한 화면에 표시되는 페이지 갯수
+	public static final int LIST_PER_PAGE = 10;		// 한 페이지당 글 목록의 개수
+	public static final int PAGE_PER_SCREEN = 10;	// 한 화면에 표시되는 페이지 개수
 	public static final String UPLOAD_PATH = "d:/Temp/upload/";
 
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,6 +49,7 @@ public class BoardController extends HttpServlet {
 		RequestDispatcher rd = null;
 		int bid = 0, page = 0;
 		String title = null, content = null, files = null, uid = null;
+		List<String> fileList = null;
 		Board board = null;
 		switch (action) {
 		case "list":
@@ -92,7 +94,7 @@ public class BoardController extends HttpServlet {
 			board = bDao.getBoard(bid);
 			String jsonFiles = board.getFiles();
 			if (!(jsonFiles == null || jsonFiles.equals(""))) {
-				List<String> fileList = ju.jsonToList(jsonFiles);
+				fileList = ju.jsonToList(jsonFiles);
 				request.setAttribute("fileList", fileList);
 			}
 			request.setAttribute("board", board);
@@ -111,7 +113,7 @@ public class BoardController extends HttpServlet {
 				content = request.getParameter("content");
 				
 				List<Part> fileParts = (List<Part>) request.getParts();
-				List<String> fileList = new ArrayList<String>();
+				fileList = new ArrayList<String>();
 				for (Part part: fileParts) {
 					String filename = part.getSubmittedFileName();
 					if (filename == null || filename.equals(""))
@@ -127,7 +129,74 @@ public class BoardController extends HttpServlet {
 				response.sendRedirect("/bbs/board/list?p=1&f=&q=");
 			}
 			break;
+		case "update":
+			if (request.getMethod().equals("GET")) {
+				bid = Integer.parseInt(request.getParameter("bid"));
+				board = bDao.getBoard(bid);
+				
+				fileList = ju.jsonToList(board.getFiles());
+				request.setAttribute("board", board);
+//				request.setAttribute("fileList", fileList);
+				session.setAttribute("fileList", fileList);
+				
+				rd = request.getRequestDispatcher("/WEB-INF/view/board/update.jsp");
+				rd.forward(request, response);
+			} else {
+				bid = Integer.parseInt(request.getParameter("bid"));
+				title = request.getParameter("title");
+				content = request.getParameter("content");
+				
+				
+				fileList = (List<String>) session.getAttribute("fileList");
+				
+				if (fileList != null && fileList.size() > 0) {
+					String[] delFiles = request.getParameterValues("delFile");
+					if (delFiles != null && delFiles.length > 0) {
+						for (String delFile : delFiles) {
+							fileList.remove(delFile);
+							File df = new File(UPLOAD_PATH + delFile);
+							df.delete();
+						}
+					}
+					
+				} else {
+					fileList = new ArrayList<String>();
+				}
+				List<Part> fileParts = (List<Part>) request.getParts();
+				for (Part part: fileParts) {
+					String filename = part.getSubmittedFileName();
+					if (filename == null || filename.equals(""))
+						continue;
+					
+					part.write(UPLOAD_PATH + filename);
+					fileList.add(filename);
+				}
+				files = ju.listToJson(fileList);
+				
+				
+				board = new Board(bid,title,content,files);
+				bDao.updateBoard(board);
+				response.sendRedirect("/bbs/board/detail?bid=" + bid + "&uid=" + sessionUid);
+				
+			}
+			break;
+			
+		case "delete":
+			bid = Integer.parseInt(request.getParameter("bid"));
+			rd = request.getRequestDispatcher("/WEB-INF/view/board/delete.jsp?bid=" + bid);
+			rd.forward(request, response);
+			break;
+		case "deleteConfirm":
+			bid = Integer.parseInt(request.getParameter("bid"));
+			bDao.deleteBoard(bid);
+			response.sendRedirect("/bbs/board/list?p=" + session.getAttribute("currentBoardPage") + "&f=&q=");
+			break;
+		default:
+			rd = request.getRequestDispatcher("/WEB-INF/view/error/error404.jsp");
+			rd.forward(request, response);
+			break;
 		}
+		
 	}
 	
 }
