@@ -93,7 +93,8 @@ Maven과 mySQL을 사용한 simple BBS project
 > maxFileSize 속성은 업로드할 수 있는 파일의 최대 크기를 지정<br>
 > maxRequestSize 속성은 multipart/form-data 요청의 최대 크기를 지정, 이 값보다 큰 요청은 처리 불가
 
-<h5>.././././</h5>
+<h5>../ 에러페이지/././</h5>
+
 <hr>
 
 
