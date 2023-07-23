@@ -27,6 +27,7 @@
         			<div class="col-6">
         				<form action="/bbs/user/update" method="post" enctype="multipart/form-data">
 			            	<input type="hidden" name="uid" value="${user.uid}">
+			            	<input type="hidden" name="hashedPwd" value="${user.pwd}">
 			            	<input type="hidden" name="filename" value="${user.profile}">
 			                <table class="table table-borderless">
 			                	<tr>
@@ -36,6 +37,14 @@
 			                    <tr>
 			                        <td><label class="col-form-label">이름</label></td>
 			                        <td><input type="text" name="uname" class="form-control" value="${user.uname}"></td>
+			                    </tr>
+			                    <tr>
+			                        <td><label class="col-form-label">비밀번호</label></td>
+			                        <td><input type="password" name="pwd" class="form-control"></td>
+			                    </tr>
+			                    <tr>
+			                        <td><label class="col-form-label">비밀번호 확인</label></td>
+			                        <td><input type="password" name="pwd2" class="form-control"></td>
 			                    </tr>
 			                    <tr>
 			                        <td><label class="col-form-label">이메일</label></td>

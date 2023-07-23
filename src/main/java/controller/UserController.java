@@ -41,7 +41,7 @@ public class UserController extends HttpServlet {
 		
 		RequestDispatcher rd = null;
 		User user = null;
-		String uid = null, pwd = null, pwd2 = null, uname = null, email = null, addr = null;
+		String uid = null, pwd = null, pwd2 = null, uname = null, email = null, addr = null, hashedPwd=null;
 		String filename = null;
 		Part filePart = null;
 		switch (action) {
@@ -131,7 +131,7 @@ public class UserController extends HttpServlet {
 					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
 					rd.forward(request, response);
 				} else {
-					String hashedPwd = BCrypt.hashpw(pwd, BCrypt.gensalt());
+					hashedPwd = BCrypt.hashpw(pwd, BCrypt.gensalt());
 					user = new User(uid, hashedPwd, uname, email, filename, addr);
 					uDao.insertUser(user);
 					request.setAttribute("msg", "등록을 마쳤습니다. 로그인하세요.");
@@ -166,14 +166,21 @@ public class UserController extends HttpServlet {
 						File oldFile = new File(PROFILE_PATH + oldFilename);
 						oldFile.delete();
 					}
+					filePart.write(PROFILE_PATH + filename);
 					String firstPart = filename.substring(0, dotPosition);
 					filename = filename.replace(firstPart, uid);
-					filePart.write(PROFILE_PATH + filename);
 				} catch (Exception e) {
 					System.out.println("프로필 사진을 변경하지 않았습니다.");
 				}
 				filename = (filename == null || filename.equals("")) ? oldFilename : filename;
-				user = new User(uid, uname, email, filename, addr);
+//				0723 add
+				pwd = request.getParameter("pwd");
+				pwd2 = request.getParameter("pwd2");
+				
+				if (pwd != null && pwd.length() > 1 && pwd.equals(pwd2)) 
+					hashedPwd = BCrypt.hashpw(pwd, BCrypt.gensalt());
+				user = new User(uid, hashedPwd, uname, email, filename, addr);
+//				0723 add
 				uDao.updateUser(user);
 				session.setAttribute("uname", uname);
 				session.setAttribute("email", email);

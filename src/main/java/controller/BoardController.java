@@ -133,11 +133,18 @@ public class BoardController extends HttpServlet {
 			if (request.getMethod().equals("GET")) {
 				bid = Integer.parseInt(request.getParameter("bid"));
 				board = bDao.getBoard(bid);
-				
-				fileList = ju.jsonToList(board.getFiles());
+				board.setTitle(board.getTitle().replace("\"", "&quot;"));
 				request.setAttribute("board", board);
+				
+//				fileList = ju.jsonToList(board.getFiles());
+//				session.setAttribute("fileList", fileList);
 //				request.setAttribute("fileList", fileList);
-				session.setAttribute("fileList", fileList);
+				
+				String uploadedFiles = board.getFiles().trim();
+				if (uploadedFiles != null && uploadedFiles.contains("list")) {
+					fileList = ju.jsonToList(uploadedFiles);
+					session.setAttribute("fileList", fileList);
+				}
 				
 				rd = request.getRequestDispatcher("/WEB-INF/view/board/update.jsp");
 				rd.forward(request, response);
