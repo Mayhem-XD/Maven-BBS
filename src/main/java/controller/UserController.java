@@ -1,6 +1,7 @@
 package controller;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import db.UserDao;
 import entity.User;
+import utility.AsideUtil;
 import utility.UserService;
 
 /**
@@ -77,6 +79,12 @@ public class UserController extends HttpServlet {
 					session.setAttribute("email", user.getEmail());
 					session.setAttribute("addr", user.getAddr());
 					session.setAttribute("profile", user.getProfile());
+					// 상태 메세지
+					String quoteFile = getServletContext().getRealPath("/") + "WEB-INF/data/todayQuote.txt";
+					AsideUtil au = new AsideUtil();
+					String stateMsg = au.getTodayQuote(quoteFile);
+					session.setAttribute("stateMsg", stateMsg);
+					
 					
 					// 환영 메세지
 					request.setAttribute("msg", user.getUname() + "님 환영합니다.");
@@ -174,11 +182,15 @@ public class UserController extends HttpServlet {
 				}
 				filename = (filename == null || filename.equals("")) ? oldFilename : filename;
 //				0723 add
+				hashedPwd = request.getParameter("hashedPwd");
 				pwd = request.getParameter("pwd");
 				pwd2 = request.getParameter("pwd2");
 				
-				if (pwd != null && pwd.length() > 1 && pwd.equals(pwd2)) 
+				boolean pwdFlag = false;
+				if (pwd != null && pwd.length() > 1 && pwd.equals(pwd2)) {
 					hashedPwd = BCrypt.hashpw(pwd, BCrypt.gensalt());
+					pwdFlag = true;
+				}
 				user = new User(uid, hashedPwd, uname, email, filename, addr);
 //				0723 add
 				uDao.updateUser(user);
@@ -186,7 +198,14 @@ public class UserController extends HttpServlet {
 				session.setAttribute("email", email);
 				session.setAttribute("addr", addr);
 				session.setAttribute("profile", filename);
-				response.sendRedirect("/bbs/user/list?page=" + session.getAttribute("currentUserPage"));
+				if (pwdFlag) {
+					request.setAttribute("msg", "패스워드가 변경 되었습니다.");
+					request.setAttribute("url", "/bbs/user/list?page=" + session.getAttribute("currentUserPage"));
+					rd = request.getRequestDispatcher("/WEB-INF/view/common/alertMsg.jsp");
+					rd.forward(request, response);
+				} else {
+					response.sendRedirect("/bbs/user/list?page=" + session.getAttribute("currentUserPage"));
+				}
 			}
 			break;
 		case "delete":
