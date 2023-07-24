@@ -69,10 +69,24 @@
                     	<c:if test="${reply.isMine eq 0}">
 	                        <div class="d-flex flex-row mt-1">
 	                            <div class="card bg-light text-dark w-75">
-	                                <div class="card-body">
-	                                    ${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}<br>
-	                                    ${reply.comment}
-	                                </div>
+	                            	<c:if test="${reply.uid eq uid }">
+		                                <div class="card-body">
+		                                <form method="post" action="/bbs/reply/delete?rid=${reply.rid}&bid=${board.bid}">
+	                                        <input type="hidden" name="bid" value="${board.bid}">
+	                                        <input type="hidden" name="uid" value="${reply.rid}">
+			                                    ${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}
+			                                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                                   	 	</form>
+		                                    <br>
+		                                    ${reply.comment}
+		                                </div>
+	                                </c:if>
+	                                <c:if test="${reply.uid ne uid }">
+	                                	<div class="card-body">
+		                                    ${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}<br>
+		                                    ${reply.comment}
+		                                </div>
+	                                </c:if>
 	                            </div>
 	                        </div>
                     	</c:if>
@@ -80,13 +94,17 @@
 	                        <div class="d-flex flex-row-reverse mt-1">
 	                            <div class="card w-75">
 	                                <div class="card-body text-end">
-	                                <form method="post" action="/bbs/reply/delete?rid=${reply.rid}&bid=${board.bid}">
-                                        <input type="hidden" name="bid" value="${board.bid}">
-                                        <input type="hidden" name="uid" value="${reply.rid}">
-	                                    	${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}
-	                                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
-                                    </form>
-	                                    
+	                                	<c:if test="${reply.uid eq uid }">
+	                                		<form method="post" action="/bbs/reply/delete?rid=${reply.rid}&bid=${board.bid}">
+		                                        <input type="hidden" name="bid" value="${board.bid}">
+		                                        <input type="hidden" name="uid" value="${reply.rid}">
+			                                    ${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}
+	                                    		<button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                                    		</form>
+	                                	</c:if>
+	                                	<c:if test="${reply.uid ne uid }">
+	                                		${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}
+	                                	</c:if>
 	                                    <br>
 	                                    ${reply.comment}
 	                                </div>

@@ -56,11 +56,12 @@ public class ReplyController extends HttpServlet {
 		case "deleteConfirm":
 			rid = request.getParameter("rid");
 			bid = Integer.parseInt(request.getParameter("bid"));
+			uid = sessionUid;
 			rDao.deleteReply(rid);
 			bDao.decreaseReplyCount(bid);
 			
 			
-			response.sendRedirect("/bbs/board/detail?bid=" + bid + "&uid=" + sessionUid);
+			response.sendRedirect("/bbs/board/detail?bid=" + bid + "&uid=" + uid);
 //			response.sendRedirect("/bbs/board/list?p=" + session.getAttribute("currentBoardPage") + "&f=&q=");
 			break;
 		}
