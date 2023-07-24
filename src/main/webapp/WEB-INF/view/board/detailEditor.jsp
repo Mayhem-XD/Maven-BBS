@@ -80,7 +80,14 @@
 	                        <div class="d-flex flex-row-reverse mt-1">
 	                            <div class="card w-75">
 	                                <div class="card-body text-end">
-	                                    ${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}<br>
+	                                <form method="post" action="/bbs/reply/delete?rid=${reply.rid}&bid=${board.bid}">
+                                        <input type="hidden" name="bid" value="${board.bid}">
+                                        <input type="hidden" name="uid" value="${reply.rid}">
+	                                    	${reply.uname}&nbsp;&nbsp;${fn:replace(reply.regTime, 'T', ' ')}
+	                                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                                    </form>
+	                                    
+	                                    <br>
 	                                    ${reply.comment}
 	                                </div>
 	                            </div>

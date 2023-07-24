@@ -151,7 +151,19 @@ public class BoardDao {
 			e.printStackTrace();
 		}
 	}
-	
+	public void decreaseReplyCount(int bid) {
+		Connection conn = getConnection();
+		String sql = "update board set replyCount=replyCount-1 where bid=?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bid);
+			
+			pstmt.executeUpdate();
+			pstmt.close(); conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	public void updateBoard(Board board) {
 		Connection conn = getConnection();
 		String sql = "update board set title=?, content=?, modTime=now(), files=? where bid=?";

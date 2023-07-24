@@ -64,6 +64,19 @@ public class ReplyDao {
 			e.printStackTrace();
 		}
 	}
+	public void deleteReply(String rid) {
+		Connection conn = getConnection();
+		String sql = "delete from reply where rid=?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, rid);
+			
+			pstmt.executeUpdate();
+			pstmt.close(); conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 
