@@ -140,6 +140,11 @@ public class UserController extends HttpServlet {
 					rd.forward(request, response);
 				} else {
 					hashedPwd = BCrypt.hashpw(pwd, BCrypt.gensalt());
+					// profile image를 정사각형으로 만들어 주는 메소드를 호출
+					if (!(filename == null || filename.equals(""))) {
+						AsideUtil au = new AsideUtil();
+						filename = au.squareImage(filename);
+					}
 					user = new User(uid, hashedPwd, uname, email, filename, addr);
 					uDao.insertUser(user);
 					request.setAttribute("msg", "등록을 마쳤습니다. 로그인하세요.");
@@ -174,13 +179,19 @@ public class UserController extends HttpServlet {
 						File oldFile = new File(PROFILE_PATH + oldFilename);
 						oldFile.delete();
 					}
-					filePart.write(PROFILE_PATH + filename);
 					String firstPart = filename.substring(0, dotPosition);
 					filename = filename.replace(firstPart, uid);
+					filePart.write(PROFILE_PATH + filename);
 				} catch (Exception e) {
 					System.out.println("프로필 사진을 변경하지 않았습니다.");
 				}
-				filename = (filename == null || filename.equals("")) ? oldFilename : filename;
+				System.out.println(filename);
+
+				if (!(filename == null || filename.equals(""))) {
+					AsideUtil au = new AsideUtil();
+					filename = au.squareImage(filename);
+				} else
+					filename = oldFilename;
 //				0723 add
 				hashedPwd = request.getParameter("hashedPwd");
 				pwd = request.getParameter("pwd");
